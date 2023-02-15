@@ -1,0 +1,45 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'review_app/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'review_app/css/styles.css' %}">
+
+    <title>News_app</title>
+</head>
+<body>
+
+        <div class="container">
+
+<!--            <div class="row">-->
+<!--                <div class="col-12 text-center">-->
+<!--                        <a class = 'my_button' href="">Скачать все новости в .xlsx</a>-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <div class="row">
+                <div class="col-lg-3 col-md-2 col-sm-12"></div>
+
+                <div class="col-lg-6 col-md-8 col-sm-12">
+                    {% for comment in comments %}
+                    <div class = 'post_style'>
+                        <h2>Отзыв №{{ comment.pk  }}</h2>
+                        <hr>
+                        <p><span class = 'decorated'>E-mail:</span> <em>{{ comment.author_email }}</em><br>
+                        <span class = 'decorated'>Автомобиль:</span> <em>{{ comment.car_key.developer_key }} {{ comment.car_key }}</em><br>
+                        <span class = 'decorated'>Страна производства:</span> <em>{{ comment.car_key.developer_key.country_key }}</em>
+                        </p>
+                        <hr>
+                        <p class = 'indent'>{{ comment.comment_text }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-lg-3 col-md-2 col-sm-12"></div>
+            </div>
+        </div>
+
+</body>
+</html>
