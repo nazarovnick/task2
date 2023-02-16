@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from review_app.views import index_page, CountryViewSet, DeveloperViewSet, CarViewSet, CommentViewSet, \
-    GenerateExcelView, CSVviewSet
+    GenerateExcelView
 from rest_framework import routers
 
 router = routers.SimpleRouter()
@@ -31,7 +31,6 @@ urlpatterns = [
     path('', index_page),
     path('api/', include(router.urls)),
     path('api/export', GenerateExcelView.as_view(), name='export'),
-    path('api/csv', CSVviewSet.as_view()),
 ]
 
 

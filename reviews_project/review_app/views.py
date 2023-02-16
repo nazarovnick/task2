@@ -32,6 +32,7 @@ class APIMixin(mixins.CreateModelMixin,
                GenericViewSet):
     pass
 
+
 class CountryViewSet(APIMixin):
 
     queryset = Country.objects.all()
@@ -60,63 +61,87 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 
 
-class CSVviewSet(APIView):
-    def get(self, request, format=None):
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="export.csv"'
-        writer = csv.DictWriter(response, fieldnames=['emp_name', 'dept', 'birth_month'])
-        writer.writeheader()
-        writer.writerow({'emp_name': 'John Smith', 'dept': 'Accounting', 'birth_month': 'November'})
-        writer.writerow({'emp_name': 'Erica Meyers', 'dept': 'IT', 'birth_month': 'March'})
-        return response
-
-
-
-
 class GenerateExcelView(APIView):
 
-    def get(self, request):
 
-        filetype = request.GET.get('type')
+        def get(self, request):
 
-        if filetype == 'csv':
-            pass
+            field_1 = 'Текст комментария'
+            field_2 = 'Дата добавления'
+            field_3 = 'E-mail автора'
+            field_4 = 'Автомобиль'
+            field_5 = 'Производитель'
+            field_6 = 'Страна'
+            field_7 = 'Дата начала производства'
+            field_8 = 'Дата окончания производства'
 
-        elif filetype == 'xlsx':
-            filename = 'all_data.xlsx'
-            wb = Workbook()
-            ws = wb.active
-            ws.title = "Workbook"
 
-            ws[f'A1'] = 'Текст комментария'
-            ws[f'B1'] = 'Дата добавления'
-            ws[f'C1'] = 'E-mail автора'
-            ws[f'D1'] = 'Автомобиль'
-            ws[f'E1'] = 'Производитель'
-            ws[f'F1'] = 'Страна'
-            ws[f'G1'] = 'Дата начала производства'
-            ws[f'H1'] = 'Дата окончания производства'
+            filetype = request.GET.get('type')
 
-            data = Comment.objects.all()
-            row_counter = 2
-            for line in data:
+            if filetype == 'csv':
 
-                ws[f'A{row_counter}'] = line.comment_text
-                ws[f'B{row_counter}'] = line.date_created.strftime('%d.%m.%Y')
-                ws[f'C{row_counter}'] = line.author_email
-                ws[f'D{row_counter}'] = line.car_key.name
-                ws[f'E{row_counter}'] = line.car_key.developer_key.name
-                ws[f'F{row_counter}'] = line.car_key.developer_key.country_key.name
-                ws[f'G{row_counter}'] = line.car_key.date_production_start.strftime('%d.%m.%Y')
-                ws[f'H{row_counter}'] = line.car_key.date_production_stop.strftime('%d.%m.%Y')
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="all_data.csv"'
+                writer = csv.DictWriter(response, fieldnames=[field_1,
+                                                              field_2,
+                                                              field_3,
+                                                              field_4,
+                                                              field_5,
+                                                              field_6,
+                                                              field_7,
+                                                              field_8])
 
-                row_counter += 1
+                writer.writeheader()
 
-            with NamedTemporaryFile() as tmp:
-                wb.save(tmp.name)
-                tmp.seek(0)
-                stream = tmp.read()
+                data = Comment.objects.all()
+                for line in data:
+                    writer.writerow({ field_1: line.comment_text,
+                                      field_2: line.date_created.strftime('%d.%m.%Y'),
+                                      field_3: line.author_email,
+                                      field_4: line.car_key.name,
+                                      field_5: line.car_key.developer_key.name,
+                                      field_6: line.car_key.developer_key.country_key.name,
+                                      field_7: line.car_key.date_production_start.strftime('%d.%m.%Y'),
+                                      field_8: line.car_key.date_production_stop.strftime('%d.%m.%Y')
+                                     })
 
-            response = HttpResponse(content = stream, content_type = 'application/ms-excel')
-            response["Content-Disposition"] = 'attachment; filename="' + filename + '"'
-            return response
+                return response
+
+            elif filetype == 'xlsx':
+                filename = 'all_data.xlsx'
+                wb = Workbook()
+                ws = wb.active
+                ws.title = "Workbook"
+
+                ws[f'A1'], ws[f'B1'], \
+                ws[f'C1'], ws[f'D1'], \
+                ws[f'E1'], ws[f'F1'], \
+                ws[f'G1'], ws[f'H1'] = \
+                field_1, field_2, \
+                field_3, field_4, \
+                field_5, field_6, \
+                field_7, field_8
+
+                data = Comment.objects.all()
+                row_counter = 2
+                for line in data:
+
+                    ws[f'A{row_counter}'] = line.comment_text
+                    ws[f'B{row_counter}'] = line.date_created.strftime('%d.%m.%Y')
+                    ws[f'C{row_counter}'] = line.author_email
+                    ws[f'D{row_counter}'] = line.car_key.name
+                    ws[f'E{row_counter}'] = line.car_key.developer_key.name
+                    ws[f'F{row_counter}'] = line.car_key.developer_key.country_key.name
+                    ws[f'G{row_counter}'] = line.car_key.date_production_start.strftime('%d.%m.%Y')
+                    ws[f'H{row_counter}'] = line.car_key.date_production_stop.strftime('%d.%m.%Y')
+
+                    row_counter += 1
+
+                with NamedTemporaryFile() as tmp:
+                    wb.save(tmp.name)
+                    tmp.seek(0)
+                    stream = tmp.read()
+
+                response = HttpResponse(content = stream, content_type = 'application/ms-excel')
+                response["Content-Disposition"] = 'attachment; filename="' + filename + '"'
+                return response
