@@ -1,15 +1,16 @@
-from django.http import HttpResponse
 from openpyxl.workbook import Workbook
 from tempfile import NamedTemporaryFile
 from rest_framework import mixins
 from django.shortcuts import render
-from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import GenericViewSet
-from rest_framework_csv.renderers import CSVRenderer
-
+from django.http import HttpResponse
+from rest_framework.views import APIView
+import csv
+from .permissions import HasTokenOrReadAndCreate
 from .models import *
 from .serializers import *
-from rest_framework.response import Response
 
 
 # Create your views here.
@@ -37,28 +38,32 @@ class CountryViewSet(APIMixin):
 
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
 
 
 class DeveloperViewSet(APIMixin):
 
     queryset = Developer.objects.all()
     serializer_class = DeveloperSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
 
 
 class CarViewSet(APIMixin):
 
     queryset = Car.objects.all()
     serializer_class = CarSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
 
 
 class CommentViewSet(APIMixin):
 
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-
-import csv
-from django.http import HttpResponse
-from rest_framework.views import APIView
+    permission_classes = (HasTokenOrReadAndCreate,)
+    authentication_classes = (TokenAuthentication,)
 
 
 class GenerateExcelView(APIView):
@@ -77,7 +82,7 @@ class GenerateExcelView(APIView):
 
 
             filetype = request.GET.get('type')
-
+            print(request.GET)
             if filetype == 'csv':
 
                 response = HttpResponse(content_type='text/csv')

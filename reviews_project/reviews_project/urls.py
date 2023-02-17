@@ -14,23 +14,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 
 from review_app.views import index_page, CountryViewSet, DeveloperViewSet, CarViewSet, CommentViewSet, \
     GenerateExcelView
 from rest_framework import routers
 
 router = routers.SimpleRouter()
-router.register(r'country', CountryViewSet)
-router.register(r'developer', DeveloperViewSet)
-router.register(r'car', CarViewSet)
-router.register(r'comment', CommentViewSet)
+router.register(r'countries', CountryViewSet)
+router.register(r'developers', DeveloperViewSet)
+router.register(r'cars', CarViewSet)
+router.register(r'comments', CommentViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index_page),
     path('api/', include(router.urls)),
-    path('api/export', GenerateExcelView.as_view(), name='export'),
+    path('api/export', GenerateExcelView.as_view()),
+    re_path(r'^api/auth/', include('djoser.urls')),
+    re_path(r'^api/auth/', include('djoser.urls.authtoken')),
 ]
 
 
