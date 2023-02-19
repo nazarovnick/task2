@@ -24,6 +24,9 @@ def index_page(request):
 
     return render(request = request, template_name = 'index.html', context = context)
 
+def ApiIndexPage(request):
+    return render(request = request, template_name = 'api.html')
+
 
 class APIMixin(mixins.CreateModelMixin,
                mixins.RetrieveModelMixin,
